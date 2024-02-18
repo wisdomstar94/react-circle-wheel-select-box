@@ -10,8 +10,14 @@ export declare namespace ICircleWheelSelectBox {
 
   export interface MenuItem {
     key: string;
-    icon: ReactNode;
-    name: ReactNode;
+    normal: {
+      icon: ReactNode;
+      name: ReactNode;
+    },
+    active?: {
+      icon: ReactNode;
+      name: ReactNode;
+    },
     value: string;
   }
 

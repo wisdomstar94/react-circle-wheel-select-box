@@ -202,6 +202,10 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
       } else if (defaultValue !== undefined) {
         selectedValue = defaultValue;
         selectedIndex = menuItems.findIndex(x => x.value === selectedValue);
+        const selectedItem = menuItems.find(x => x.value === selectedValue);
+        if (onSelectedItem !== undefined) {
+          onSelectedItem(selectedItem);
+        }
       }
 
       const degUnit = 360 / menuItems.length;
@@ -209,6 +213,7 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
       setWheelDeg(wheelDegSync.current);
       setWheelDegCommit(wheelDegSync.current);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMenuItem, defaultValue, menuItems, isWheelReadjusting]);
 
   useEffect(() => {
@@ -312,10 +317,24 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
                           className={`${styles['item-content']} ${isWheelReadjusting ? styles['transition-300ms'] : ''}`} 
                           style={{ transform: `rotate(${-wheelDeg}deg)` }}>
                           <div className={styles['icon-area']}>
-                            { item.icon }
+                            { 
+                              (function(){
+                                if (selectedMenuItem?.value === item.value && item.active !== undefined) {
+                                  return item.active.icon;
+                                }
+                                return item.normal.icon;
+                              })()
+                            }
                           </div>
                           <div className={styles['name-area']}>
-                            { item.name }
+                            { 
+                              (function(){
+                                if (selectedMenuItem?.value === item.value && item.active !== undefined) {
+                                  return item.active.name;
+                                }
+                                return item.normal.name;
+                              })()
+                            }
                           </div>
                         </div>
                       </div>

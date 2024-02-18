@@ -11,13 +11,13 @@ export default function Page() {
   const [innerCircleSize, setInnerCircleSize] = useState(80);
   const [selectedMenuItem, setSelectedMenuItem] = useState<ICircleWheelSelectBox.MenuItem>();
   const [menuItems, setMenuItems] = useState<Array<ICircleWheelSelectBox.MenuItem>>([
-    { key: '1', icon: <><TbApple /></>, name: <span className="text-xs">사과</span>, value: 'apple' },
-    { key: '2', icon: <><TbAlertOctagonFilled /></>, name: <span className="text-xs">경고</span>, value: 'notice' },
-    { key: '3', icon: <><TbBellFilled /></>, name: <span className="text-xs">알림</span>, value: 'alram' },
-    { key: '4', icon: <><TbBrandAws /></>, name: <span className="text-xs">AWS</span>, value: 'aws' },
-    { key: '5', icon: <><TbBrandGithubFilled /></>, name: <span className="text-xs">Github</span>, value: 'github' },
-    { key: '6', icon: <><TbBrandTwitterFilled /></>, name: <span className="text-xs">X</span>, value: 'X' },
-    { key: '7', icon: <><TbBrandVue /></>, name: <span className="text-xs">Vue</span>, value: 'Vue' },
+    { key: '1', normal: { icon: <><TbApple /></>, name: <span className="text-xs">사과</span>, }, active: { icon: <><TbApple className="text-blue-500" /></>, name: <span className="text-xs text-blue-500">사과</span>, }, value: 'apple' },
+    { key: '2', normal: { icon: <><TbAlertOctagonFilled /></>, name: <span className="text-xs">경고</span>, }, active: { icon: <><TbAlertOctagonFilled className="text-blue-500" /></>, name: <span className="text-xs text-blue-500">경고</span>, }, value: 'notice' },
+    { key: '3', normal: { icon: <><TbBellFilled /></>, name: <span className="text-xs">알림</span>, }, active: { icon: <><TbBellFilled className="text-blue-500" /></>, name: <span className="text-xs text-blue-500">알림</span>, }, value: 'alram' },
+    { key: '4', normal: { icon: <><TbBrandAws /></>, name: <span className="text-xs">AWS</span>, }, active: { icon: <><TbBrandAws className="text-blue-500" /></>, name: <span className="text-xs text-blue-500">AWS</span>, }, value: 'aws' },
+    { key: '5', normal: { icon: <><TbBrandGithubFilled /></>, name: <span className="text-xs">Github</span>, }, active: { icon: <><TbBrandGithubFilled className="text-blue-500" /></>, name: <span className="text-xs text-blue-500">Github</span>, }, value: 'github' },
+    { key: '6', normal: { icon: <><TbBrandTwitterFilled /></>, name: <span className="text-xs">X</span>, }, active: { icon: <><TbBrandTwitterFilled className="text-blue-500" /></>, name: <span className="text-xs text-blue-500">X</span>, }, value: 'X' },
+    { key: '7', normal: { icon: <><TbBrandVue /></>, name: <span className="text-xs">Vue</span>, }, active: { icon: <><TbBrandVue className="text-blue-500" /></>, name: <span className="text-xs text-blue-500">Vue</span>, }, value: 'Vue' },
   ]);
 
   // useEffect(() => {
@@ -46,6 +46,7 @@ export default function Page() {
           </>}
           menuItems={menuItems}
           selectedMenuItem={selectedMenuItem}
+          defaultValue="apple"
           onClick={(item) => {
             console.log('@clicked item', item);
           }}
@@ -60,8 +61,12 @@ export default function Page() {
           className="inline-flex text-xs border border-slate-500 px-2 py-0.5 cursor-pointer hover:bg-slate-100"
           onClick={() => {
             setMenuItems([
-              { key: '1', icon: <><TbApple /></>, name: <>사과</>, value: 'apple' },
-              { key: '2', icon: <><TbAlertOctagonFilled /></>, name: <>경고</>, value: 'notice' },
+              { key: '1', normal: { icon: <><TbApple /></>, name: <span className="text-xs">사과</span>, }, value: 'apple' },
+              { key: '2', normal: { icon: <><TbAlertOctagonFilled /></>, name: <span className="text-xs">경고</span>, }, value: 'notice' },
+              { key: '3', normal: { icon: <><TbBellFilled /></>, name: <span className="text-xs">알림</span>, }, value: 'alram' },
+              { key: '4', normal: { icon: <><TbBrandAws /></>, name: <span className="text-xs">AWS</span>, }, value: 'aws' },
+              { key: '5', normal: { icon: <><TbBrandGithubFilled /></>, name: <span className="text-xs">Github</span>, }, value: 'github' },
+              { key: '6', normal: { icon: <><TbBrandTwitterFilled /></>, name: <span className="text-xs">X</span>, }, active: { icon: <><TbBrandTwitterFilled className="text-blue-500" /></>, name: <span className="text-xs text-blue-500">X</span>, }, value: 'X' },
             ]);
           }}>
           menuItems 바꾸기
