@@ -1,0 +1,83 @@
+"use client"
+
+import { CircleWheelSelectBox } from "@/components/circle-wheel-select-box/circle-wheel-select-box.component";
+import { ICircleWheelSelectBox } from "@/components/circle-wheel-select-box/circle-wheel-select-box.interface";
+import { useState } from "react";
+import { TbAlertOctagonFilled, TbApple, TbBellFilled } from "react-icons/tb";
+
+export default function Page() {
+  const [size, setSize] = useState(400);
+  const [innerCircleSize, setInnerCircleSize] = useState(200);
+  const [menuItems, setMenuItems] = useState<Array<ICircleWheelSelectBox.MenuItem>>([
+    {
+      key: '1',
+      icon: <>
+        <TbApple />
+      </>,
+      name: <>
+        사과
+      </>,
+    }
+  ]);
+
+  return (
+    <>
+      <div>
+        <h2>
+          test/basic
+        </h2>
+      </div>
+      <div>
+        <CircleWheelSelectBox
+          size={size}
+          innerCircleSize={innerCircleSize}
+          innerCircleContent={<><div className="w-full h-full bg-blue-400"></div></>}
+          menuItems={menuItems}
+          />
+      </div>
+      <div>
+        <button
+          onClick={() => {
+            setMenuItems([
+              {
+                key: '1',
+                icon: <>
+                  <TbApple />
+                </>,
+                name: <>
+                  사과
+                </>,
+              },
+              {
+                key: '2',
+                icon: <>
+                  <TbAlertOctagonFilled />
+                </>,
+                name: <>
+                  경고
+                </>,
+              },
+              {
+                key: '3',
+                icon: <>
+                  <TbBellFilled />
+                </>,
+                name: <>
+                  알림
+                </>,
+              },
+            ])
+          }}>
+          menuItems 바꾸기
+        </button>
+        <button
+          onClick={() => {
+            setSize(200);
+            setInnerCircleSize(100);
+          }}>
+          size 바꾸기
+        </button>
+      </div>
+    </>
+  );
+}
