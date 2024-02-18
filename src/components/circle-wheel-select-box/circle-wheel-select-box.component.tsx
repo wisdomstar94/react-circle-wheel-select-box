@@ -145,11 +145,6 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     const remain = wheelDegSync.current % degUnit;
     let _wheelDeg = wheelDegSync.current;
 
-    console.log('');
-    console.log('--------------------------------');
-    // console.log('@remain', remain);
-    console.log('@original _wheelDeg', _wheelDeg);
-
     if (remain > 0) {
       if (remain >= degUnitHalf) {
         const value = degUnit - remain;
