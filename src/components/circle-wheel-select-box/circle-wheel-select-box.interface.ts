@@ -20,6 +20,7 @@ export declare namespace ICircleWheelSelectBox {
   }
 
   export interface Props {
+    containerClassName?: string;
     size: number;
     innerCircleSize: number;
     innerCircleContent?: ReactNode;
@@ -27,5 +28,6 @@ export declare namespace ICircleWheelSelectBox {
     selectedMenuItem?: MenuItem;
     defaultValue?: string;
     onClick?: (item: MenuItem) => void;
+    onSelectedItem?: (item: MenuItem | undefined) => void;
   }
 }

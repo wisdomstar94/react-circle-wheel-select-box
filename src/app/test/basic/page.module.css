@@ -1,0 +1,15 @@
+.my-wheeler {
+  /* border-image: linear-gradient(to right, #12acf3 0%, #246bee 100%);
+  border-image-slice: 1;
+  border-width: 1px;
+  border-radius: 9999px;
+ */
+
+
+  border: 10px solid transparent;
+  border-radius: 9999px;
+  background-image: linear-gradient(#fff, #fff), linear-gradient(to right, #12acf3 0%, #246bee 100%);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  box-sizing: content-box;
+}

@@ -6,6 +6,7 @@ import { useAddEventListener } from '@wisdomstar94/react-add-event-listener';
 
 export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
   const {
+    containerClassName,
     size,
     innerCircleSize,
     innerCircleContent,
@@ -13,14 +14,15 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     selectedMenuItem,
     defaultValue,
     onClick,
+    onSelectedItem,
   } = props;
   const backgroundSvgRef = useRef<SVGSVGElement>(null);
   const innerCircleRef = useRef<HTMLDivElement>(null);
   const innerCircleVirtualRef = useRef<HTMLDivElement>(null);
-  const menuItemsKeyString = menuItems.map(k => k.key).join('_');
 
   const wheelContainerPressedCursorClientCoordinate = useRef<ICircleWheelSelectBox.Coordinate>();
   const isWheelContainerPressed = useRef(false);
+  const wheelContainerPressedTimestamp = useRef(0);
 
   const [isWheelReadjusting, setIsWheelReadjusting] = useState(false);
   const isWheelReadjustingSync = useRef(isWheelReadjusting);
@@ -88,6 +90,7 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     }
 
     isWheelContainerPressed.current = true;
+    wheelContainerPressedTimestamp.current = Date.now();
     wheelContainerPressedCursorClientCoordinate.current = cursorCoordinate;
   }
 
@@ -124,40 +127,15 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
   }
 
   function pointerUp() {
-    // if (isWheelContainerPressed.current) {
-    //   isWheelReadjustingSync.current = true;
-    //   setIsWheelReadjusting(isWheelReadjustingSync.current);
-    // }
-    isWheelReadjustingSync.current = true;
-    setIsWheelReadjusting(isWheelReadjustingSync.current);
-    
+    if (isWheelContainerPressed.current) {
+      isWheelReadjustingSync.current = true;
+      setIsWheelReadjusting(isWheelReadjustingSync.current);
+    }
+    // isWheelReadjustingSync.current = true;
+    // setIsWheelReadjusting(isWheelReadjustingSync.current);
+
     isWheelContainerPressed.current = false;
   }
-
-  // function cursorPositionTargetInnerCircleCenter(targetCoordinate: ICircleWheelSelectBox.Coordinate): ICircleWheelSelectBox.CursorPosition {
-  //   let value: ICircleWheelSelectBox.CursorPosition = 'top-right';
-
-  //   const innerCircle = innerCircleVirtualRef.current;
-  //   if (innerCircle !== null) {
-  //     const innerCircleClientRect = innerCircle.getBoundingClientRect();
-  //     const innerCircleCenterClientCoordinate: ICircleWheelSelectBox.Coordinate = {
-  //       x: innerCircleClientRect.left + (innerCircleSize / 2),
-  //       y: innerCircleClientRect.top + (innerCircleSize / 2),
-  //     };
-  //     console.log('@innerCircleCenterClientCoordinate', innerCircleCenterClientCoordinate);
-  //     if (targetCoordinate.x <= innerCircleCenterClientCoordinate.x && targetCoordinate.y >= innerCircleCenterClientCoordinate.y) {
-  //       value = 'bottom-left';
-  //     } else if (targetCoordinate.x >= innerCircleCenterClientCoordinate.x && targetCoordinate.y >= innerCircleCenterClientCoordinate.y) {
-  //       value = 'bottom-right';
-  //     } else if (targetCoordinate.x >= innerCircleCenterClientCoordinate.x && targetCoordinate.y <= innerCircleCenterClientCoordinate.y) {
-  //       value = 'top-right';
-  //     } else if (targetCoordinate.x <= innerCircleCenterClientCoordinate.x && targetCoordinate.y <= innerCircleCenterClientCoordinate.y) {
-  //       value = 'top-left';
-  //     }
-  //   }
-
-  //   return value;
-  // }
 
   useEffect(() => {
     if (!isWheelReadjusting) return;
@@ -187,6 +165,20 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
         _wheelDeg -= value;
       }
     }
+
+    // selected item 계산
+    let wheelDegRemain = _wheelDeg % 360;
+    if (wheelDegRemain < 0) wheelDegRemain = -wheelDegRemain;
+    const selectedItem = menuItems.find((item, index) => {
+      const currentItemDeg = degUnit * index;
+      const difference = currentItemDeg - wheelDegRemain;
+      return difference >= -2 && difference <= 2;
+    });
+    if (onSelectedItem !== undefined) {
+      if (selectedItem?.value !== selectedMenuItem?.value) {
+        onSelectedItem(selectedItem);
+      }
+    }
     
     setWheelDeg(_wheelDeg);
     wheelDegSync.current = _wheelDeg;
@@ -200,20 +192,24 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
   }, [isWheelReadjusting]);
 
   useEffect(() => {
-    if (selectedMenuItem !== undefined) {
-      const selectedValue = selectedMenuItem.value;
-      const selctedIndex = menuItems.findIndex(x => x.value === selectedValue);
-      console.log('@selctedIndex', selctedIndex);
-      console.log('@selectedMenuItem', selectedMenuItem);
+    if (isWheelReadjusting) return;
+    if (selectedMenuItem !== undefined || defaultValue !== undefined) {
+      let selectedValue = '';
+      let selectedIndex = 0;
+      if (selectedMenuItem !== undefined) {
+        selectedValue = selectedMenuItem.value;
+        selectedIndex = menuItems.findIndex(x => x.value === selectedValue);
+      } else if (defaultValue !== undefined) {
+        selectedValue = defaultValue;
+        selectedIndex = menuItems.findIndex(x => x.value === selectedValue);
+      }
+
       const degUnit = 360 / menuItems.length;
-      console.log('@degUnit', degUnit);
-      wheelDegSync.current = -(degUnit * (selctedIndex));
+      wheelDegSync.current = -(degUnit * (selectedIndex));
       setWheelDeg(wheelDegSync.current);
       setWheelDegCommit(wheelDegSync.current);
-    } else if (defaultValue !== undefined) {
-
     }
-  }, [selectedMenuItem, defaultValue, menuItems]);
+  }, [selectedMenuItem, defaultValue, menuItems, isWheelReadjusting]);
 
   useEffect(() => {
     // console.log('1');
@@ -264,18 +260,19 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
               .endAngle(endAgle)
               .cornerRadius(0)
           )
-          .style('fill', `rgb(${temprand(0, 255)}, ${temprand(0, 255)}, ${temprand(0, 255)})`)
+          // .style('fill', `rgb(${temprand(0, 255)}, ${temprand(0, 255)}, ${temprand(0, 255)})`)
+          .style('fill', `rgb(255, 255, 255`)
           .attr('transform', `translate(${translateX}, ${translateY})`)
         ;
       })
     ;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuItemsKeyString, size, innerCircleSize]);
+  }, [menuItems, size, innerCircleSize]);
 
   return (
     <>
       <div 
-        className={styles['container']} style={{ width: `${size}px`, height: `${size}px` }}
+        className={`${styles['container']} ${containerClassName ?? ''}`} style={{ width: `${size}px`, height: `${size}px` }}
         onMouseDown={(event) => {
           pointerDown({
             x: event.clientX,
@@ -304,6 +301,10 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
                       <div className={styles['item-content-wrapper-2']} style={{ transform: `rotate(-${getItemRotateDeg(index)}deg)` }}>
                         <div 
                           onClick={() => {
+                            if (Date.now() - wheelContainerPressedTimestamp.current >= 200) {
+                              return;
+                            }
+
                             if (onClick !== undefined) {
                               onClick(item);
                             }

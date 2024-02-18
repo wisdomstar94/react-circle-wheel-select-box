@@ -4,7 +4,7 @@
   position: relative;
   border-radius: 9999px;
   shape-outside: circle();
-  background-color: #eee;
+  background-color: #fff;
   user-select: none;
 }
 
@@ -30,7 +30,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: -1;
+  box-sizing: content-box;
 }
 .menu-list-wrapper ul.menu-list {
   width: 100%;
