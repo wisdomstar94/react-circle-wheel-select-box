@@ -1,12 +1,23 @@
 {
-  "name": "react-circle-wheel-select-box",
+  "name": "@wisdomstar94/react-circle-wheel-select-box",
   "version": "0.0.1",
+  "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3330",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "pack:build": "node ./build.esbuild.js",
+    "pack:build:tsc": "tsc --project ./tsconfig.package.json"
+  },
+  "main": "index.ts",
+  "repository": "https://github.com/wisdomstar94/react-circle-wheel-select-box",
+  "peerDependencies": {
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
@@ -14,8 +25,11 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@wisdomstar94/react-add-event-listener": "^0.0.5",
+    "@wisdomstar94/react-body": "^0.0.2",
     "autoprefixer": "^10.0.1",
     "d3": "^7.8.5",
+    "esbuild": "^0.20.0",
+    "esbuild-css-modules-plugin": "^3.1.0",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "next": "14.1.0",

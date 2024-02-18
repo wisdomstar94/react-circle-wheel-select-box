@@ -3,6 +3,7 @@ import { ICircleWheelSelectBox } from "./circle-wheel-select-box.interface";
 import styles from './circle-wheel-select-box.module.css';
 import { arc, select } from "d3";
 import { useAddEventListener } from '@wisdomstar94/react-add-event-listener';
+import { useBody } from '@wisdomstar94/react-body';
 
 export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
   const {
@@ -29,6 +30,8 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
   const [wheelDeg, setWheelDeg] = useState(0);
   const wheelDegSync = useRef(wheelDeg);
   const [wheelDegCommit, setWheelDegCommit] = useState(0);
+
+  const body = useBody();
 
   function getItemRotateDeg(index: number): number {
     if (index === 0) {
@@ -89,6 +92,7 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
       return;
     }
 
+    body.denyScroll();
     isWheelContainerPressed.current = true;
     wheelContainerPressedTimestamp.current = Date.now();
     wheelContainerPressedCursorClientCoordinate.current = cursorCoordinate;
@@ -128,6 +132,7 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
 
   function pointerUp() {
     if (isWheelContainerPressed.current) {
+      body.allowScroll();
       isWheelReadjustingSync.current = true;
       setIsWheelReadjusting(isWheelReadjustingSync.current);
     }
