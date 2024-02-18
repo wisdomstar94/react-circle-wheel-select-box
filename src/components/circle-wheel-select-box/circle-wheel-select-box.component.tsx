@@ -145,7 +145,10 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     const remain = wheelDegSync.current % degUnit;
     let _wheelDeg = wheelDegSync.current;
 
+    console.log('');
+    console.log('--------------------------------');
     // console.log('@remain', remain);
+    console.log('@original _wheelDeg', _wheelDeg);
 
     if (remain > 0) {
       if (remain >= degUnitHalf) {
@@ -167,12 +170,15 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     }
 
     // selected item 계산
-    let wheelDegRemain = _wheelDeg % 360;
-    if (wheelDegRemain < 0) wheelDegRemain = -wheelDegRemain;
+    const wheelDegRemain = _wheelDeg % 360;
     const selectedItem = menuItems.find((item, index) => {
-      const currentItemDeg = degUnit * index;
-      const difference = currentItemDeg - wheelDegRemain;
-      return difference >= -2 && difference <= 2;
+      let currentItemDeg = -(degUnit * (index));
+      let difference = -100;
+      if (wheelDegRemain > 0) {
+        currentItemDeg += 360;
+      }
+      difference = wheelDegRemain - currentItemDeg;
+      return (difference >= -2 && difference <= 2);
     });
     if (onSelectedItem !== undefined) {
       if (selectedItem?.value !== selectedMenuItem?.value) {
@@ -192,7 +198,8 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
   }, [isWheelReadjusting]);
 
   useEffect(() => {
-    if (isWheelReadjusting) return;
+    if (isWheelReadjustingSync.current) return;
+
     if (selectedMenuItem !== undefined || defaultValue !== undefined) {
       let selectedValue = '';
       let selectedIndex = 0;
