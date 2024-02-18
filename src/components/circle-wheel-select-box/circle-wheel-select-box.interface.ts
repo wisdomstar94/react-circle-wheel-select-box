@@ -24,6 +24,8 @@ export declare namespace ICircleWheelSelectBox {
     innerCircleSize: number;
     innerCircleContent?: ReactNode;
     menuItems: MenuItem[];
+    selectedMenuItem?: MenuItem;
+    defaultValue?: string;
     onClick?: (item: MenuItem) => void;
   }
 }

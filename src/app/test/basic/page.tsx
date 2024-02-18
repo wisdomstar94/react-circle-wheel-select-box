@@ -17,6 +17,7 @@ export default function Page() {
     { key: '6', icon: <><TbBrandTwitterFilled /></>, name: <span className="text-xs">X</span>, value: 'X' },
     { key: '7', icon: <><TbBrandVue /></>, name: <span className="text-xs">Vue</span>, value: 'Vue' },
   ]);
+  const [selectedMenuItem, setSelectedMenuItem] = useState<ICircleWheelSelectBox.MenuItem>();
 
   return (
     <>
@@ -31,13 +32,15 @@ export default function Page() {
           innerCircleSize={innerCircleSize}
           innerCircleContent={<><div className="w-full h-full bg-blue-400"></div></>}
           menuItems={menuItems}
+          selectedMenuItem={selectedMenuItem}
           onClick={(item) => {
             console.log('@clicked item', item);
           }}
           />
       </div>
-      <div className="p-4">
+      <div className="p-4 flex flex-wrap gap-4">
         <button
+          className="inline-flex text-xs border border-slate-500 px-2 py-0.5 cursor-pointer hover:bg-slate-100"
           onClick={() => {
             setMenuItems([
               { key: '1', icon: <><TbApple /></>, name: <>사과</>, value: 'apple' },
@@ -47,11 +50,19 @@ export default function Page() {
           menuItems 바꾸기
         </button>
         <button
+          className="inline-flex text-xs border border-slate-500 px-2 py-0.5 cursor-pointer hover:bg-slate-100"
           onClick={() => {
             setSize(200);
             setInnerCircleSize(100);
           }}>
           size 바꾸기
+        </button>
+        <button
+          className="inline-flex text-xs border border-slate-500 px-2 py-0.5 cursor-pointer hover:bg-slate-100"
+          onClick={() => {
+            setSelectedMenuItem(menuItems[6]);
+          }}>
+          selected item 바꾸기
         </button>
       </div>
     </>

@@ -10,6 +10,8 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     innerCircleSize,
     innerCircleContent,
     menuItems,
+    selectedMenuItem,
+    defaultValue,
     onClick,
   } = props;
   const backgroundSvgRef = useRef<SVGSVGElement>(null);
@@ -122,10 +124,14 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
   }
 
   function pointerUp() {
-    isWheelContainerPressed.current = false;
-    
+    // if (isWheelContainerPressed.current) {
+    //   isWheelReadjustingSync.current = true;
+    //   setIsWheelReadjusting(isWheelReadjustingSync.current);
+    // }
     isWheelReadjustingSync.current = true;
     setIsWheelReadjusting(isWheelReadjustingSync.current);
+    
+    isWheelContainerPressed.current = false;
   }
 
   // function cursorPositionTargetInnerCircleCenter(targetCoordinate: ICircleWheelSelectBox.Coordinate): ICircleWheelSelectBox.CursorPosition {
@@ -161,7 +167,7 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     const remain = wheelDegSync.current % degUnit;
     let _wheelDeg = wheelDegSync.current;
 
-    console.log('@remain', remain);
+    // console.log('@remain', remain);
 
     if (remain > 0) {
       if (remain >= degUnitHalf) {
@@ -192,6 +198,22 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     }, 300);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWheelReadjusting]);
+
+  useEffect(() => {
+    if (selectedMenuItem !== undefined) {
+      const selectedValue = selectedMenuItem.value;
+      const selctedIndex = menuItems.findIndex(x => x.value === selectedValue);
+      console.log('@selctedIndex', selctedIndex);
+      console.log('@selectedMenuItem', selectedMenuItem);
+      const degUnit = 360 / menuItems.length;
+      console.log('@degUnit', degUnit);
+      wheelDegSync.current = -(degUnit * (selctedIndex));
+      setWheelDeg(wheelDegSync.current);
+      setWheelDegCommit(wheelDegSync.current);
+    } else if (defaultValue !== undefined) {
+
+    }
+  }, [selectedMenuItem, defaultValue, menuItems]);
 
   useEffect(() => {
     // console.log('1');
