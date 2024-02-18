@@ -10,14 +10,21 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
     innerCircleSize,
     innerCircleContent,
     menuItems,
+    onClick,
   } = props;
   const backgroundSvgRef = useRef<SVGSVGElement>(null);
   const innerCircleRef = useRef<HTMLDivElement>(null);
+  const innerCircleVirtualRef = useRef<HTMLDivElement>(null);
   const menuItemsKeyString = menuItems.map(k => k.key).join('_');
 
   const wheelContainerPressedCursorClientCoordinate = useRef<ICircleWheelSelectBox.Coordinate>();
   const isWheelContainerPressed = useRef(false);
+
+  const [isWheelReadjusting, setIsWheelReadjusting] = useState(false);
+  const isWheelReadjustingSync = useRef(isWheelReadjusting);
   const [wheelDeg, setWheelDeg] = useState(0);
+  const wheelDegSync = useRef(wheelDeg);
+  const [wheelDegCommit, setWheelDegCommit] = useState(0);
 
   function getItemRotateDeg(index: number): number {
     if (index === 0) {
@@ -74,18 +81,20 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
   });
 
   function pointerDown(cursorCoordinate: ICircleWheelSelectBox.Coordinate) {
+    if (isWheelReadjustingSync.current) {
+      return;
+    }
+
     isWheelContainerPressed.current = true;
     wheelContainerPressedCursorClientCoordinate.current = cursorCoordinate;
   }
 
   function pointerMove(info: ICircleWheelSelectBox.PointerMoveInfo) {
     if (!isWheelContainerPressed.current) return;
-    if (innerCircleRef.current === null) return;
+    if (innerCircleVirtualRef.current === null) return;
     if (wheelContainerPressedCursorClientCoordinate.current === undefined) return;
 
-    console.log('@pointerMove', info);
-
-    const innerCircleClientRect = innerCircleRef.current.getBoundingClientRect();
+    const innerCircleClientRect = innerCircleVirtualRef.current.getBoundingClientRect();
     const pressStartedCursorCoordinate = wheelContainerPressedCursorClientCoordinate.current;
     const currentCursorCoordinate = info.client;
     const innerCircleCenterClientCoordinate: ICircleWheelSelectBox.Coordinate = {
@@ -93,144 +102,96 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
       y: innerCircleClientRect.top + (innerCircleSize / 2),
     };
 
-    const pressStartedCursorPosition = cursorPositionTargetInnerCircleCenter(pressStartedCursorCoordinate);
-    const currentCursorPosition = cursorPositionTargetInnerCircleCenter(currentCursorCoordinate);
+    const pressStartedA = innerCircleCenterClientCoordinate.x - pressStartedCursorCoordinate.x;
+    const pressStartedB = innerCircleCenterClientCoordinate.y - pressStartedCursorCoordinate.y;
 
-    // console.log('@innerCircleCenterClientCoordinate', innerCircleCenterClientCoordinate);
-    // console.log('@pressStartedCursorPosition', pressStartedCursorPosition);
+    const startInitGravityDeg = Math.atan2(pressStartedB, pressStartedA) / (Math.PI / 180);
 
-    let pressStartedA = 0;
-    let pressStartedB = 0;
-    pressStartedA = pressStartedCursorCoordinate.x - innerCircleCenterClientCoordinate.x;
-    pressStartedB = pressStartedCursorCoordinate.y - innerCircleCenterClientCoordinate.y;
-    // switch(pressStartedCursorPosition) {
-    //   case 'top-left': {
-    //     pressStartedA = innerCircleCenterClientCoordinate.x - pressStartedCursorCoordinate.x;
-    //     pressStartedB = innerCircleCenterClientCoordinate.y - pressStartedCursorCoordinate.y;
-    //   } break;
-    //   case 'top-right': {
-    //     pressStartedA = pressStartedCursorCoordinate.x - innerCircleCenterClientCoordinate.x;
-    //     pressStartedB = innerCircleCenterClientCoordinate.y - pressStartedCursorCoordinate.y;
-    //   } break;
-    //   case 'bottom-right': {
-    //     pressStartedA = pressStartedCursorCoordinate.x - innerCircleCenterClientCoordinate.x;
-    //     pressStartedB = pressStartedCursorCoordinate.y - innerCircleCenterClientCoordinate.y;
-    //   } break;
-    //   case 'bottom-left': {
-    //     pressStartedA = innerCircleCenterClientCoordinate.x - pressStartedCursorCoordinate.x;
-    //     pressStartedB = pressStartedCursorCoordinate.y - innerCircleCenterClientCoordinate.y;
-    //   } break;
-    // }
-
-    const startInitGravityDeg = Math.atan2(pressStartedA, pressStartedB) / (Math.PI / 180);
-    console.log('@startInitGravityDeg', startInitGravityDeg);
-
-    let currentA = 0;
-    let currentB = 0;
-    console.log('@currentCursorPosition', currentCursorPosition);
-    currentA = currentCursorCoordinate.x - innerCircleCenterClientCoordinate.x;
-    currentB = currentCursorCoordinate.y - innerCircleCenterClientCoordinate.y;
-    // switch(currentCursorPosition) {
-    //   case 'top-left': {
-    //     currentA = innerCircleCenterClientCoordinate.x - currentCursorCoordinate.x;
-    //     currentB = innerCircleCenterClientCoordinate.y - currentCursorCoordinate.y;
-    //   } break;
-    //   case 'top-right': {
-    //     currentA = currentCursorCoordinate.x - innerCircleCenterClientCoordinate.x;
-    //     currentB = innerCircleCenterClientCoordinate.y - currentCursorCoordinate.y;
-    //   } break;
-    //   case 'bottom-right': {
-    //     currentA = currentCursorCoordinate.x - innerCircleCenterClientCoordinate.x;
-    //     currentB = currentCursorCoordinate.y - innerCircleCenterClientCoordinate.y;
-    //   } break;
-    //   case 'bottom-left': {
-    //     currentA = innerCircleCenterClientCoordinate.x - currentCursorCoordinate.x;
-    //     currentB = currentCursorCoordinate.y - innerCircleCenterClientCoordinate.y;
-    //   } break;
-    // }
-    console.log('currentA, currentB', { currentA, currentB });
-    const currentGravityDeg = Math.atan2(currentA, currentB) / (Math.PI / 180);
-    console.log('@currentGravityDeg', currentGravityDeg);
+    const currentA = innerCircleCenterClientCoordinate.x - currentCursorCoordinate.x;
+    const currentB = innerCircleCenterClientCoordinate.y - currentCursorCoordinate.y;
+    const currentGravityDeg = Math.atan2(currentB, currentA) / (Math.PI / 180);
 
     let applyDeg = 0;
     if (startInitGravityDeg <= currentGravityDeg) {
-      applyDeg = currentGravityDeg - startInitGravityDeg;
+      applyDeg = wheelDegCommit + (currentGravityDeg - startInitGravityDeg);
     } else {
-      applyDeg = 360 - (startInitGravityDeg - currentGravityDeg);
+      applyDeg = wheelDegCommit - (startInitGravityDeg - currentGravityDeg);
     }
-
     setWheelDeg(applyDeg);
-
-
-
-    // switch(pressStartedCursorPosition) {
-    //   case 'top-left': {
-    //     const a = innerCircleCenterClientCoordinate.x - pressStartedCursorCoordinate.x;
-    //     const b = innerCircleCenterClientCoordinate.y - pressStartedCursorCoordinate.y;
-    //     const startInitGravityDeg = Math.atan2(b, a) / (Math.PI / 180);
-    //     console.log('@startInitGravityDeg', startInitGravityDeg);
-    //     switch(currentCursorPosition) {
-    //       case 'top-left': {
-    //         const a = innerCircleCenterClientCoordinate.x - currentCursorCoordinate.x;
-    //         const b = innerCircleCenterClientCoordinate.y - currentCursorCoordinate.y;
-    //         console.log('a, b', { a, b });
-    //         const currentGravityDeg = Math.atan2(b, a) / (Math.PI / 180);
-    //         console.log('@currentGravityDeg', currentGravityDeg);
-    //         // if ()
-    //       } break;
-    //       case 'top-right': {
-
-    //       } break;
-    //       case 'bottom-right': {
-
-    //       } break;
-    //       case 'bottom-left': {
-
-    //       } break;
-    //     } 
-    //   } break;
-    //   case 'top-right': {
-
-    //   } break;
-    //   case 'bottom-right': {
-
-    //   } break;
-    //   case 'bottom-left': {
-
-    //   } break;
-    // }
+    wheelDegSync.current = applyDeg;
   }
 
   function pointerUp() {
     isWheelContainerPressed.current = false;
+    
+    isWheelReadjustingSync.current = true;
+    setIsWheelReadjusting(isWheelReadjustingSync.current);
   }
 
-  function cursorPositionTargetInnerCircleCenter(targetCoordinate: ICircleWheelSelectBox.Coordinate): ICircleWheelSelectBox.CursorPosition {
-    let value: ICircleWheelSelectBox.CursorPosition = 'top-right';
+  // function cursorPositionTargetInnerCircleCenter(targetCoordinate: ICircleWheelSelectBox.Coordinate): ICircleWheelSelectBox.CursorPosition {
+  //   let value: ICircleWheelSelectBox.CursorPosition = 'top-right';
 
-    // console.log('@targetCoordinate', targetCoordinate);
+  //   const innerCircle = innerCircleVirtualRef.current;
+  //   if (innerCircle !== null) {
+  //     const innerCircleClientRect = innerCircle.getBoundingClientRect();
+  //     const innerCircleCenterClientCoordinate: ICircleWheelSelectBox.Coordinate = {
+  //       x: innerCircleClientRect.left + (innerCircleSize / 2),
+  //       y: innerCircleClientRect.top + (innerCircleSize / 2),
+  //     };
+  //     console.log('@innerCircleCenterClientCoordinate', innerCircleCenterClientCoordinate);
+  //     if (targetCoordinate.x <= innerCircleCenterClientCoordinate.x && targetCoordinate.y >= innerCircleCenterClientCoordinate.y) {
+  //       value = 'bottom-left';
+  //     } else if (targetCoordinate.x >= innerCircleCenterClientCoordinate.x && targetCoordinate.y >= innerCircleCenterClientCoordinate.y) {
+  //       value = 'bottom-right';
+  //     } else if (targetCoordinate.x >= innerCircleCenterClientCoordinate.x && targetCoordinate.y <= innerCircleCenterClientCoordinate.y) {
+  //       value = 'top-right';
+  //     } else if (targetCoordinate.x <= innerCircleCenterClientCoordinate.x && targetCoordinate.y <= innerCircleCenterClientCoordinate.y) {
+  //       value = 'top-left';
+  //     }
+  //   }
 
-    const innerCircle = innerCircleRef.current;
-    if (innerCircle !== null) {
-      const innerCircleClientRect = innerCircle.getBoundingClientRect();
-      const innerCircleCenterClientCoordinate: ICircleWheelSelectBox.Coordinate = {
-        x: innerCircleClientRect.left + (innerCircleSize / 2),
-        y: innerCircleClientRect.top + (innerCircleSize / 2),
-      };
-      // console.log('@innerCircleCenterClientCoordinate', innerCircleCenterClientCoordinate);
-      if (targetCoordinate.x <= innerCircleCenterClientCoordinate.x && targetCoordinate.y >= innerCircleCenterClientCoordinate.y) {
-        value = 'bottom-left';
-      } else if (targetCoordinate.x >= innerCircleCenterClientCoordinate.x && targetCoordinate.y >= innerCircleCenterClientCoordinate.y) {
-        value = 'bottom-right';
-      } else if (targetCoordinate.x >= innerCircleCenterClientCoordinate.x && targetCoordinate.y <= innerCircleCenterClientCoordinate.y) {
-        value = 'top-right';
-      } else if (targetCoordinate.x <= innerCircleCenterClientCoordinate.x && targetCoordinate.y <= innerCircleCenterClientCoordinate.y) {
-        value = 'top-left';
+  //   return value;
+  // }
+
+  useEffect(() => {
+    if (!isWheelReadjusting) return;
+
+    const degUnit = 360 / menuItems.length;
+    const degUnitHalf = degUnit / 2;
+    const remain = wheelDegSync.current % degUnit;
+    let _wheelDeg = wheelDegSync.current;
+
+    console.log('@remain', remain);
+
+    if (remain > 0) {
+      if (remain >= degUnitHalf) {
+        const value = degUnit - remain;
+        _wheelDeg += value;
+      } else {
+        const value = remain;
+        _wheelDeg -= value;
+      }
+    } else if (remain < 0) {
+      if (-degUnitHalf <= remain) {
+        const value = -remain;
+        _wheelDeg += value;
+      } else {
+        const temp = degUnit + remain;
+        const value = temp;
+        _wheelDeg -= value;
       }
     }
+    
+    setWheelDeg(_wheelDeg);
+    wheelDegSync.current = _wheelDeg;
+    setWheelDegCommit(_wheelDeg);
 
-    return value;
-  }
+    setTimeout(() => {
+      isWheelReadjustingSync.current = false;
+      setIsWheelReadjusting(isWheelReadjustingSync.current);
+    }, 300);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWheelReadjusting]);
 
   useEffect(() => {
     // console.log('1');
@@ -306,7 +267,7 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
           });
         }}
         >
-        <div className={styles['menu-list-wrapper']} style={{ transform: `rotate(${wheelDeg}deg)` }}>
+        <div className={`${styles['menu-list-wrapper']} ${isWheelReadjusting ? styles['transition-300ms'] : ''}`} style={{ transform: `rotate(${wheelDeg}deg)` }}>
           <div className={styles['menu-list-background']}>
             <svg className={styles['background-svg']} ref={backgroundSvgRef} width={size} height={size}></svg>
           </div>
@@ -317,14 +278,22 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
                   <li key={item.key} className={styles['item']} style={{ transform: `rotate(${getItemRotateDeg(index)}deg)` }}>
                     <div 
                       className={styles['item-content-wrapper']} 
-                      style={{ height: `calc(100% - ${innerCircleSize / 2}px)` }} 
-                      onClick={item.onClick}>
-                      <div className={styles['item-content']} style={{ transform: `rotate(-${getItemRotateDeg(index)}deg)` }}>
-                        <div className={styles['icon-area']}>
-                          { item.icon }
-                        </div>
-                        <div className={styles['name-area']}>
-                          { item.name }
+                      style={{ height: `calc(100% - ${innerCircleSize / 2}px)` }} >
+                      <div className={styles['item-content-wrapper-2']} style={{ transform: `rotate(-${getItemRotateDeg(index)}deg)` }}>
+                        <div 
+                          onClick={() => {
+                            if (onClick !== undefined) {
+                              onClick(item);
+                            }
+                          }}
+                          className={`${styles['item-content']} ${isWheelReadjusting ? styles['transition-300ms'] : ''}`} 
+                          style={{ transform: `rotate(${-wheelDeg}deg)` }}>
+                          <div className={styles['icon-area']}>
+                            { item.icon }
+                          </div>
+                          <div className={styles['name-area']}>
+                            { item.name }
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -336,6 +305,9 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
           <div ref={innerCircleRef} className={styles['inner-circie-container']} style={{ width: `${innerCircleSize}px`, height: `${innerCircleSize}px` }}>
             { innerCircleContent }
           </div>
+        </div>
+        <div ref={innerCircleVirtualRef} className={styles['virtual-inner-circle']} style={{ left: `calc(50% - ${innerCircleSize / 2}px)`, top: `calc(50% - ${innerCircleSize / 2}px)` }}>
+
         </div>
       </div>
     </>

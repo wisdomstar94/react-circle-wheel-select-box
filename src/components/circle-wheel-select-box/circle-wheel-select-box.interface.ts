@@ -12,7 +12,7 @@ export declare namespace ICircleWheelSelectBox {
     key: string;
     icon: ReactNode;
     name: ReactNode;
-    onClick?: () => void;
+    value: string;
   }
 
   export interface PointerMoveInfo {
@@ -24,5 +24,6 @@ export declare namespace ICircleWheelSelectBox {
     innerCircleSize: number;
     innerCircleContent?: ReactNode;
     menuItems: MenuItem[];
+    onClick?: (item: MenuItem) => void;
   }
 }
