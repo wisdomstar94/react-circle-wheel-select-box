@@ -6,8 +6,8 @@ import { useState } from "react";
 import { TbAlertOctagonFilled, TbApple, TbBellFilled } from "react-icons/tb";
 
 export default function Page() {
-  const [size, setSize] = useState(400);
-  const [innerCircleSize, setInnerCircleSize] = useState(200);
+  const [size, setSize] = useState(200);
+  const [innerCircleSize, setInnerCircleSize] = useState(100);
   const [menuItems, setMenuItems] = useState<Array<ICircleWheelSelectBox.MenuItem>>([
     {
       key: '1',
