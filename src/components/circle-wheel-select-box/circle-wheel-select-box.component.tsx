@@ -90,7 +90,10 @@ export function CircleWheelSelectBox(props: ICircleWheelSelectBox.Props) {
               menuItems.map((item, index) => {
                 return (
                   <li key={item.key} className={styles['item']} style={{ transform: `rotate(${getItemRotateDeg(index)}deg)` }}>
-                    <div className={styles['item-content-wrapper']} style={{ height: `calc(100% - ${innerCircleSize / 2}px)` }}>
+                    <div 
+                      className={styles['item-content-wrapper']} 
+                      style={{ height: `calc(100% - ${innerCircleSize / 2}px)` }} 
+                      onClick={item.onClick}>
                       <div className={styles['item-content']} style={{ transform: `rotate(-${getItemRotateDeg(index)}deg)` }}>
                         <div className={styles['icon-area']}>
                           { item.icon }

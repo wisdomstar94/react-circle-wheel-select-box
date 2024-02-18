@@ -5,6 +5,7 @@ export declare namespace ICircleWheelSelectBox {
     key: string;
     icon: ReactNode;
     name: ReactNode;
+    onClick?: () => void;
   }
 
   export interface Props {

@@ -17,7 +17,34 @@ export default function Page() {
       name: <>
         사과
       </>,
-    }
+      onClick: () => {
+        console.log('사과 입니다.');
+      },
+    },
+    {
+      key: '2',
+      icon: <>
+        <TbAlertOctagonFilled />
+      </>,
+      name: <>
+        경고
+      </>,
+      onClick: () => {
+        console.log('경고 입니다.');
+      },
+    },
+    {
+      key: '3',
+      icon: <>
+        <TbBellFilled />
+      </>,
+      name: <>
+        알림
+      </>,
+      onClick: () => {
+        console.log('알림 입니다.');
+      },
+    },
   ]);
 
   return (
@@ -47,6 +74,9 @@ export default function Page() {
                 name: <>
                   사과
                 </>,
+                onClick: () => {
+                  console.log('사과 입니다.');
+                },
               },
               {
                 key: '2',
@@ -56,17 +86,11 @@ export default function Page() {
                 name: <>
                   경고
                 </>,
+                onClick: () => {
+                  console.log('경고 입니다.');
+                },
               },
-              {
-                key: '3',
-                icon: <>
-                  <TbBellFilled />
-                </>,
-                name: <>
-                  알림
-                </>,
-              },
-            ])
+            ]);
           }}>
           menuItems 바꾸기
         </button>
